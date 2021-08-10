@@ -19,24 +19,33 @@ namespace full_coverage_path_planner
 {
 void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
 {
+  
+  // ???????????? what's the name parameter? 
+  
   if (!initialized_)
+    //????????????? initialized meaning"? 
   {
     // Create a publisher to visualize the plan
     ros::NodeHandle private_nh("~/");
     ros::NodeHandle nh, private_named_nh("~/" + name);
-
+        
     plan_pub_ = private_named_nh.advertise<nav_msgs::Path>("plan", 1);
-    // Try to request the cpp-grid from the cpp_grid map_server
+    
+    //?????? what's cpp-grid for?? Try to request the cpp-grid from the cpp_grid map_server
+    
     cpp_grid_client_ = nh.serviceClient<nav_msgs::GetMap>("static_map");
     // Get the cost map:
     costmap_ros_ = costmap_ros;
+    //???????? are we making a local copy of the costmap here?
     costmap_ = costmap_ros->getCostmap();
 
     // Define  robot radius (radius) parameter
     float robot_radius_default = 0.5f;
+    //???????? how does the f work?
     private_named_nh.param<float>("robot_radius", robot_radius_, robot_radius_default);
     // Define  tool radius (radius) parameter
     float tool_radius_default = 0.5f;
+    //???????? what is tool radius?
     private_named_nh.param<float>("tool_radius", tool_radius_, tool_radius_default);
     initialized_ = true;
   }
@@ -45,11 +54,12 @@ void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* co
 std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bool> > const& grid, std::list<gridNode_t>& init,
                                         std::vector<std::vector<bool> >& visited)
 {
+  //??????????? what's grid??? What's init?
+
   int dx, dy, x2, y2, i, nRows = grid.size(), nCols = grid[0].size();
   // Mountain pattern filling of the open space
   // Copy incoming list to 'end'
   std::list<gridNode_t> pathNodes(init);
-
   // Set starting pos
   x2 = pathNodes.back().pos.x;
   y2 = pathNodes.back().pos.y; 
@@ -80,15 +90,18 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
       dy = 0;
       break;
   }
-
+  
+//??????? where does everything initialize. what does it mean by bool done false?
   bool done = false;
   while (!done)
   {
     // 1. drive straight until not a valid move (hit occupied cell or at end of map)
+
     bool hitWall = false;
     while(!hitWall) {
       x2 += dx;
       y2 += dy;
+          //????? valid comes from????????
       if (!validMove(x2, y2, nCols, nRows, grid, visited))
       {
         hitWall = true;
@@ -98,12 +111,15 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
       }
       if (!hitWall) {
         addNodeToList(x2, y2, pathNodes, visited);
+         //??????? add node to list mainly to mark visited
       }
     }
 
     // 2. check left and right after hitting wall, then change direction
     if (robot_dir == north || robot_dir == south)
     {
+      //???????????????? how did we transition to this state where the robot knows it has hit a wall
+      // if going north/south, then check if (now if it goes east/west is valid move, if it's not, then deadend)
       if (!validMove(x2 + 1, y2, nCols, nRows, grid, visited)
         && !validMove(x2 - 1, y2, nCols, nRows, grid, visited)) {
         // dead end, exit
@@ -118,6 +134,7 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
         x2++;
         pattern_dir_ = east;
       } else {
+       
         // both sides are opened. If don't have a prefered turn direction, travel towards most open direction
         if (!(pattern_dir_ == east || pattern_dir_ == west)) {
           if (validMove(x2, y2 + 1, nCols, nRows, grid, visited)) {
@@ -127,6 +144,7 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
           }
           ROS_INFO("rotation dir with most space successful");
         }
+        // ????????????????when do we get into the following state?
         if (pattern_dir_ = east) {
             x2++;
         } else if (pattern_dir_ = west) {
@@ -138,6 +156,7 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
       addNodeToList(x2, y2, pathNodes, visited);
 
       // change direction 180 deg
+      //??????????????? is this if east/west all occupied. turnback?
       if (robot_dir == north) {
         robot_dir = south;
         dy = -1;
