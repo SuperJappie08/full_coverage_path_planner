@@ -19,7 +19,6 @@ namespace full_coverage_path_planner
 {
 void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
 {
-  
   // ???????????? what's the name parameter? 
   
   if (!initialized_)
@@ -50,6 +49,8 @@ void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* co
     initialized_ = true;
   }
 }
+   //???????????can you help me understand what's the difference betwene this and the stc one? 
+
 
 std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bool> > const& grid, std::list<gridNode_t>& init,
                                         std::vector<std::vector<bool> >& visited)
@@ -215,6 +216,9 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
   return pathNodes;
 }
 
+   //???????????can you help me understand what's the difference betwene this and the stc one? 
+
+  
 std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<bool> > const& grid,
                                           Point_t& init,
                                           int &multiple_pass_counter,
