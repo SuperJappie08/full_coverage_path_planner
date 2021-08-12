@@ -315,6 +315,7 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
 bool BoustrophedonSTC::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal,
                          std::vector<geometry_msgs::PoseStamped>& plan)
 {
+  // ??????????? Posestamped is the current location in cartesian from what particular frame? whats header what;s pose?
   if (!initialized_)
   {
     ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
@@ -328,6 +329,7 @@ bool BoustrophedonSTC::makePlan(const geometry_msgs::PoseStamped& start, const g
   //clear the plan, just in case
   plan.clear();
   costmap_ = costmap_ros_->getCostmap();
+  //?????????????? is the costmap_ros_ a global variable ?
 // this is updated cost map??
   clock_t begin = clock();
   Point_t startPoint;
