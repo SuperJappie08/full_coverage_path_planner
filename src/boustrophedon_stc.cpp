@@ -211,6 +211,7 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
   }
   // Log
   // printPathNodes(pathNodes);
+  //???????????? what is pathnode? 
   return pathNodes;
 }
 
@@ -219,8 +220,11 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
                                           int &multiple_pass_counter,
                                           int &visited_counter)
 {
+  //?????????????? what's multiple pass counter??
+  
   int x, y, nRows = grid.size(), nCols = grid[0].size();
   pattern_dir_ = point;
+  //????????pattern_dir_=point??
   // Initial node is initially set as visited so it does not count
   multiple_pass_counter = 0;
   visited_counter = 0;
@@ -233,10 +237,12 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
   // add initial point to pathNodes
   std::list<gridNode_t> pathNodes;
   std::list<Point_t> fullPath;
+  //????? diffrence between the above 2 variables?
   addNodeToList(x, y, pathNodes, visited);
 
   std::list<Point_t> goals = map_2_goals(visited, eNodeOpen);  // Retrieve all goalpoints (Cells not visited)
   std::cout << "Goals Left: " << goals.size() << std::endl;
+  //????? how many goals to start with???(all cells not visited?)
   std::list<gridNode_t>::iterator it;
 
 #ifdef DEBUG_PLOT
@@ -256,12 +262,14 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
     for (it = pathNodes.begin(); it != pathNodes.end(); ++it)
     {
       Point_t newPoint = { it->pos.x, it->pos.y };
+      //????? is this a pointer or another operation? (Above).... what do we need a visited couunter??
       visited_counter++;
       fullPath.push_back(newPoint);
+      //????????? what is fullpath pushback again?
     }
 
     goals = map_2_goals(visited, eNodeOpen);  // Retrieve remaining goalpoints
-
+//????? what are we doing here again? why are we erasing the elements???-> is it to start the new path?
     // Remove all elements from pathNodes list except last element.
     // The last point is the starting point for a new search and A* extends the path from there on
     pathNodes.erase(pathNodes.begin(), --(pathNodes.end()));
@@ -270,6 +278,8 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
     // `goals` is essentially the map, so we use `goals` to determine the distance from the end of a potential path
     //    to the nearest free space
     bool resign = a_star_to_open_space(grid, pathNodes.back(), 1, visited, goals, pathNodes);
+    //??????????? what does it mean by open space is resigning?? what variables are we passing in?
+    
     if (resign)
     {
       ROS_WARN("A_star_to_open_space is resigning! This may be due to the open cells outside of the obstacle boundary. Goals Left: %u", goals.size());
@@ -282,6 +292,7 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
       if (visited[it->pos.y][it->pos.x])
       {
         multiple_pass_counter++;
+        //???????(how does this multiple pass counter varaible work and what does it do?
       }
       visited[it->pos.y][it->pos.x] = eNodeVisited;
     }
@@ -297,7 +308,7 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
 #endif
 
   }
-
+  // ???????????? how frequent are we returning full path..
   return fullPath;
 }
 
@@ -317,7 +328,7 @@ bool BoustrophedonSTC::makePlan(const geometry_msgs::PoseStamped& start, const g
   //clear the plan, just in case
   plan.clear();
   costmap_ = costmap_ros_->getCostmap();
-
+// this is updated cost map??
   clock_t begin = clock();
   Point_t startPoint;
 
@@ -351,6 +362,8 @@ bool BoustrophedonSTC::makePlan(const geometry_msgs::PoseStamped& start, const g
                                               startPoint,
                                               boustrophedon_cpp_metrics_.multiple_pass_counter,
                                               boustrophedon_cpp_metrics_.visited_counter);
+  
+  //???? The above returns the path?
   ROS_INFO("naive cpp completed!");
   ROS_INFO("Converting path to plan");
 
