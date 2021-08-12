@@ -228,7 +228,7 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
   
   int x, y, nRows = grid.size(), nCols = grid[0].size();
   pattern_dir_ = point;
-  //????????pattern_dir_=point??
+  //????????pattern_dir_=point?? (where does the point come from??
   // Initial node is initially set as visited so it does not count
   multiple_pass_counter = 0;
   visited_counter = 0;
@@ -241,10 +241,13 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
   // add initial point to pathNodes
   std::list<gridNode_t> pathNodes;
   std::list<Point_t> fullPath;
+  
+  //??????????? what is gridnode_t (is that a specific type of variable?)
   //????? diffrence between the above 2 variables?
   addNodeToList(x, y, pathNodes, visited);
 
   std::list<Point_t> goals = map_2_goals(visited, eNodeOpen);  // Retrieve all goalpoints (Cells not visited)
+  //????????????? where does this list of goalpoints come from?
   std::cout << "Goals Left: " << goals.size() << std::endl;
   //????? how many goals to start with???(all cells not visited?)
   std::list<gridNode_t>::iterator it;
@@ -257,12 +260,13 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
   while (goals.size() != 0)
   {
     // boustrophedon pattern from current position
+    //???????????????????? how does goal and boustrophedon mix?
     pathNodes = boustrophedon(grid, pathNodes, visited);
 #ifdef DEBUG_PLOT
     ROS_INFO("Visited grid updated after boustrophedon:");
     printGrid(grid, visited, pathNodes, PatternStart, pathNodes.back());
 #endif
-
+// what's this for loop for again?
     for (it = pathNodes.begin(); it != pathNodes.end(); ++it)
     {
       Point_t newPoint = { it->pos.x, it->pos.y };
