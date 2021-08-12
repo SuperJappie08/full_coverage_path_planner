@@ -20,6 +20,8 @@
 
 using std::string;
 
+//?????????? What's this file for again? define the classes?
+
 #ifndef FULL_COVERAGE_PATH_PLANNER_BOUSTROPHEDON_STC_H
 #define FULL_COVERAGE_PATH_PLANNER_BOUSTROPHEDON_STC_H
 
@@ -39,6 +41,7 @@ public:
   static std::list<gridNode_t> boustrophedon(std::vector<std::vector<bool> > const &grid, std::list<gridNode_t> &init,
                                       std::vector<std::vector<bool> > &visited);
 
+// ????????? Why is init a list?
   /**
    * Perform Boustrophedon-STC (Spanning Tree Coverage) coverage path planning.
    * In essence, the robot moves forward until an obstacle or visited node is met, then turns right or left (making a boustrophedon pattern)
@@ -60,6 +63,7 @@ private:
    * @param plan The plan... filled by the planner
    * @return True if a valid plan was found, false otherwise
    */
+   // ?????????? How does this work again?
   bool makePlan(const geometry_msgs::PoseStamped &start, const geometry_msgs::PoseStamped &goal,
                 std::vector<geometry_msgs::PoseStamped> &plan);
 
