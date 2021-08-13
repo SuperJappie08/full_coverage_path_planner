@@ -13,6 +13,9 @@ int distanceToClosestPoint(Point_t poi, std::list<Point_t> const& goals)
 {
   // Return minimum distance from goals-list
   int min_dist = INT_MAX;
+  //POI starting point
+  //??????????????????????? is the list of goals, one block at a time? (distance is reading all the cells)
+  //??????????? where does the Goal list come from and it's entirely not sorted? Also, why distance squared not regular distance?
   std::list<Point_t>::const_iterator it;
   for (it = goals.begin(); it != goals.end(); ++it)
   {
@@ -53,11 +56,13 @@ int distanceSquared(const Point_t& p1, const Point_t& p2)
  * Sort vector<gridNode> by the heuristic value of the last element
  * @return whether last elem. of first has a larger heuristic value than last elem of second
  */
+// ????????????????????? why do we need to compare last element of first vs second? also, why not in .h file?
 bool sort_gridNodePath_heuristic_desc(const std::vector<gridNode_t> &first, const std::vector<gridNode_t> &second)
 {
   return (first.back().he > second.back().he);
 }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//?????????????????????? don't know how this is done... 
 bool a_star_to_open_space(std::vector<std::vector<bool> > const &grid, gridNode_t init, int cost,
                           std::vector<std::vector<bool> > &visited, std::list<Point_t> const &open_space,
                           std::list<gridNode_t> &pathNodes)
@@ -65,6 +70,8 @@ bool a_star_to_open_space(std::vector<std::vector<bool> > const &grid, gridNode_
   uint dx, dy, dx_prev, nRows = grid.size(), nCols = grid[0].size();
 
   std::vector<std::vector<bool> > closed(nRows, std::vector<bool>(nCols, eNodeOpen));
+  //?????????? can you help me understand this initialization... with () in middle??  matrix of values (why nrows/std::vector<bool>
+  
   // All nodes in the closest list are currently still open
 
   closed[init.pos.y][init.pos.x] = eNodeVisited;  // Of course we have visited the current/initial location
@@ -74,6 +81,7 @@ bool a_star_to_open_space(std::vector<std::vector<bool> > const &grid, gridNode_
 #endif
 
   std::vector<std::vector<gridNode_t> > open1(1, std::vector<gridNode_t>(1, init));  // open1 is a *vector* of paths
+  //????? how does this work???? where does this vector of path gets generated??
 
   while (true)
   {
@@ -85,13 +93,14 @@ bool a_star_to_open_space(std::vector<std::vector<bool> > const &grid, gridNode_
       // Empty end_node list and add init as only element
       pathNodes.erase(pathNodes.begin(), --(pathNodes.end()));
       pathNodes.push_back(init);
+      // What does this do push init back???????????????????? do we just not go anywhere? (what does resign mean?)
       return true;  // We resign, cannot find a path
     }
     else
     {
-      // Sort elements from high to low (because sort_gridNodePath_heuristic_desc uses a > b)
+      // ????????????Sort elements from high to low (because sort_gridNodePath_heuristic_desc uses a > b)
       std::sort(open1.begin(), open1.end(), sort_gridNodePath_heuristic_desc);
-
+      //???????? what's the difference between Open1.end vs open1.back?
       std::vector<gridNode_t> nn = open1.back();  // Get the *path* with the lowest heuristic cost
       open1.pop_back();  // The last element is no longer open because we use it here, so remove from open list
 #ifdef DEBUG_PLOT
@@ -200,6 +209,7 @@ bool a_star_to_open_space(std::vector<std::vector<bool> > const &grid, gridNode_
     }
   }
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void printGrid(std::vector<std::vector<bool> > const& grid, std::vector<std::vector<bool> > const& visited,
                std::list<Point_t> const& path)
@@ -210,11 +220,11 @@ void printGrid(std::vector<std::vector<bool> > const& grid, std::vector<std::vec
     {
       if (visited[iy][ix])
       {
-        if (ix == path.front().x && iy == path.front().y)
+        if (ix == path.front().x && iy == path.front().y) //path.front = (starting) // whatis this kind of code????
         {
           std::cout << "\033[1;32m▓\033[0m";  // Show starting position in green color
         }
-        else if (ix == path.back().x && iy == path.back().y)
+        else if (ix == path.back().x && iy == path.back().y) path.back = red
         {
           std::cout << "\033[1;31m▓\033[0m";  // Show stopping position in red color
         }
@@ -224,7 +234,7 @@ void printGrid(std::vector<std::vector<bool> > const& grid, std::vector<std::vec
         }
         else
         {
-          std::cout << "\033[1;36m▓\033[0m";
+          std::cout << "\033[1;36m▓\033[0m";// what is this again? unvisited? 
         }
       }
       else
@@ -236,6 +246,7 @@ void printGrid(std::vector<std::vector<bool> > const& grid, std::vector<std::vec
   }
 }
 
+// ????????? why do we need multiple print grid
 void printGrid(std::vector<std::vector<bool> > const& grid, std::vector<std::vector<bool> > const& visited,
                std::list<gridNode_t> const& path, gridNode_t start, gridNode_t end)
 {
@@ -301,9 +312,12 @@ std::list<Point_t> map_2_goals(std::vector<std::vector<bool> > const& grid, bool
     for (ix = 0; ix < nCols; ++(ix))
     {
       if (grid[iy][ix] == value_to_search)
+        
+        //?????????? is the given value to search True or False?? what is the end purpose of this function?
       {
         Point_t p = { ix, iy };  // x, y
         goals.push_back(p);
+    //????????????? what's the difference on push_back?
       }
     }
   }
@@ -326,6 +340,7 @@ bool validMove(int x2, int y2, int nCols, int nRows,
 {
   return (x2 >= 0 && x2 < nCols && y2 >= 0 && y2 < nRows) // path node is within the map
         && (grid[y2][x2] == eNodeOpen && visited[y2][x2] == eNodeOpen); // the path node is unvisited
+  // ??????????? meaning, not visited, and no obstacles.
 }
 
 void addNodeToList(int x2, int y2, std::list<gridNode_t>& pathNodes,
@@ -337,7 +352,7 @@ void addNodeToList(int x2, int y2, std::list<gridNode_t>& pathNodes,
     0,          // Cost
     0,          // Heuristic
   };
-  pathNodes.push_back(new_node);
+  pathNodes.push_back(new_node); // turn point into gridnode and pushback in to path node to add new node!! ** add make it visited 
   visited[y2][x2] = eNodeVisited;  // Close node
   return;
 }
@@ -371,11 +386,13 @@ int dirWithMostSpace(int x_init, int y_init, int nCols, int nRows,
           break;
       }
       free_space_in_dir[i]++;
+      // counter for space
     } while (validMove(x2, y2, nCols, nRows, grid, visited));
   }
 
+  //????????? use the biggest value***-> 
   // set initial direction towards direction with most travel possible
-  int robot_dir = 0;
+
   int indexValue = 0;
   for (int i = 1; i <= 4; i++) {
       // std::cout << "free space in " << i << ": " << free_space_in_dir[i] << std::endl;
