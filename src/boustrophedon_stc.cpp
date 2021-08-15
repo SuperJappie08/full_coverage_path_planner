@@ -1,4 +1,4 @@
-//
+//STC just does boustrophon and a-start back and forth
 // Copyright [2020] Nobleo Technology"  [legal/copyright]
 //
 #include <algorithm>
@@ -20,42 +20,45 @@ namespace full_coverage_path_planner
 void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
 {
   // ???????????? what's the name parameter? 
+ // gives cost map***> 
   
   if (!initialized_)
-    //????????????? initialized meaning"? 
+    //
+    //????????????? initialized meaning"? -> main access point to communicate with everything ros (ROS node = process)...-> node handle***-> ( change visibility )...-> 
   {
     // Create a publisher to visualize the plan
     ros::NodeHandle private_nh("~/");
     ros::NodeHandle nh, private_named_nh("~/" + name);
         
     plan_pub_ = private_named_nh.advertise<nav_msgs::Path>("plan", 1);
-    
-    //?????? what's cpp-grid for?? Try to request the cpp-grid from the cpp_grid map_server
+    // from nodehandle... publisher... (Access point to ROS function)..-> create a subscriber/publisher
+    //?????? what's cpp-grid for?? Try to request the cpp-grid from the cpp_grid map_server-> get static map.. published by map server (png file)---> occupancy grid (map)...-> publish map
+    //service(request directly from node) vs subscribe/publisher(calling function in other node)--> get map...-> gives the map***-> actually not using this... (not using static map but cost map)
     
     cpp_grid_client_ = nh.serviceClient<nav_msgs::GetMap>("static_map");
     // Get the cost map:
     costmap_ros_ = costmap_ros;
     //???????? are we making a local copy of the costmap here?
     costmap_ = costmap_ros->getCostmap();
-
+// all with _ end are global variable...
+    
     // Define  robot radius (radius) parameter
     float robot_radius_default = 0.5f;
     //???????? how does the f work?
     private_named_nh.param<float>("robot_radius", robot_radius_, robot_radius_default);
-    // Define  tool radius (radius) parameter
-    float tool_radius_default = 0.5f;
-    //???????? what is tool radius?
+    // Define  tool radius (radius) parameter (does the coverage***) robot radius-> 
+    float tool_radius_default = 0.5f; // ***** need to change to a smaller number... ( get it from param (param name to radius (navigation.launch under robot core to get it)..
+//
     private_named_nh.param<float>("tool_radius", tool_radius_, tool_radius_default);
     initialized_ = true;
   }
 }
-   //???????????can you help me understand what's the difference betwene this and the stc one? 
+   //boustrophedon (only the mountain pattern up and down)... stc(spanning key tree coverage----> reach deadend... still have area to cover (a-star)...-> 
 
 
 std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bool> > const& grid, std::list<gridNode_t>& init,
                                         std::vector<std::vector<bool> >& visited)
 {
-  //??????????? what's grid??? What's init?
 
   int dx, dy, x2, y2, i, nRows = grid.size(), nCols = grid[0].size();
   // Mountain pattern filling of the open space
@@ -92,7 +95,6 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
       break;
   }
   
-//??????? where does everything initialize. what does it mean by bool done false?
   bool done = false;
   while (!done)
   {
@@ -102,7 +104,6 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
     while(!hitWall) {
       x2 += dx;
       y2 += dy;
-          //????? valid comes from????????
       if (!validMove(x2, y2, nCols, nRows, grid, visited))
       {
         hitWall = true;
@@ -112,14 +113,12 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
       }
       if (!hitWall) {
         addNodeToList(x2, y2, pathNodes, visited);
-         //??????? add node to list mainly to mark visited
       }
     }
 
     // 2. check left and right after hitting wall, then change direction
     if (robot_dir == north || robot_dir == south)
     {
-      //???????????????? how did we transition to this state where the robot knows it has hit a wall
       // if going north/south, then check if (now if it goes east/west is valid move, if it's not, then deadend)
       if (!validMove(x2 + 1, y2, nCols, nRows, grid, visited)
         && !validMove(x2 - 1, y2, nCols, nRows, grid, visited)) {
@@ -146,6 +145,7 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
           ROS_INFO("rotation dir with most space successful");
         }
         // ????????????????when do we get into the following state?
+        // preferred turn direction ***-> variable pattern direction***=> top if right here***-> pattern direction not EAST r WEst***-> ( if no preferred turn direction---> travel to most open)
         if (pattern_dir_ = east) {
             x2++;
         } else if (pattern_dir_ = west) {
@@ -157,7 +157,6 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
       addNodeToList(x2, y2, pathNodes, visited);
 
       // change direction 180 deg
-      //??????????????? is this if east/west all occupied. turnback?
       if (robot_dir == north) {
         robot_dir = south;
         dy = -1;
@@ -212,11 +211,8 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
   }
   // Log
   // printPathNodes(pathNodes);
-  //???????????? what is pathnode? 
   return pathNodes;
 }
-
-   //???????????can you help me understand what's the difference betwene this and the stc one? 
 
   
 std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<bool> > const& grid,
@@ -224,11 +220,11 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
                                           int &multiple_pass_counter,
                                           int &visited_counter)
 {
-  //?????????????? what's multiple pass counter??
+  //?????????????? what's multiple pass counter->  while update visited (outpput statistical....->  log )
   
   int x, y, nRows = grid.size(), nCols = grid[0].size();
   pattern_dir_ = point;
-  //????????pattern_dir_=point?? (where does the point come from??
+  //initialize something no direction associated with it yet***->  (Default)
   // Initial node is initially set as visited so it does not count
   multiple_pass_counter = 0;
   visited_counter = 0;
