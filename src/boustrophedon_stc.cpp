@@ -219,7 +219,7 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
                                           Point_t& init,
                                           int &multiple_pass_counter,
                                           int &visited_counter)
-{
+{//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   //?????????????? what's multiple pass counter->  while update visited (outpput statistical....->  log )
   
   int x, y, nRows = grid.size(), nCols = grid[0].size();
@@ -256,7 +256,7 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
   while (goals.size() != 0)
   {
     // boustrophedon pattern from current position
-    //???????????????????? how does goal and boustrophedon mix?
+    //goal ****-
     pathNodes = boustrophedon(grid, pathNodes, visited);
 #ifdef DEBUG_PLOT
     ROS_INFO("Visited grid updated after boustrophedon:");
