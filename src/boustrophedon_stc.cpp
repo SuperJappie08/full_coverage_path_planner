@@ -31,14 +31,18 @@ void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* co
     ros::NodeHandle nh, private_named_nh("~/" + name);
         
     plan_pub_ = private_named_nh.advertise<nav_msgs::Path>("plan", 1);
+     
     // from nodehandle... publisher... (Access point to ROS function)..-> create a subscriber/publisher
     //?????? what's cpp-grid for?? Try to request the cpp-grid from the cpp_grid map_server-> get static map.. published by map server (png file)---> occupancy grid (map)...-> publish map
     //service(request directly from node) vs subscribe/publisher(calling function in other node)--> get map...-> gives the map***-> actually not using this... (not using static map but cost map)
+    /////////////////////// why some public some private???
+    /////////////////////// where does the Path or Getmap come from??
+    /////////////////////// advertise path for?????? /what's service client for??????
     
     cpp_grid_client_ = nh.serviceClient<nav_msgs::GetMap>("static_map");
     // Get the cost map:
     costmap_ros_ = costmap_ros;
-    //???????? are we making a local copy of the costmap here?
+    //???????? are we making a local copy(global variable) of the costmap here?
     costmap_ = costmap_ros->getCostmap();
 // all with _ end are global variable...
     
@@ -238,12 +242,10 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
   std::list<gridNode_t> pathNodes;
   std::list<Point_t> fullPath;
   
-  //??????????? what is gridnode_t (is that a specific type of variable?)
-  //????? diffrence between the above 2 variables?
   addNodeToList(x, y, pathNodes, visited);
 
   std::list<Point_t> goals = map_2_goals(visited, eNodeOpen);  // Retrieve all goalpoints (Cells not visited)
-  //????????????? where does this list of goalpoints come from?
+  ///////////????????????? where does this list of goalpoints come from? (how does it work?)
   std::cout << "Goals Left: " << goals.size() << std::endl;
   //????? how many goals to start with???(all cells not visited?)
   std::list<gridNode_t>::iterator it;
@@ -258,11 +260,12 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
     // boustrophedon pattern from current position
     //goal ****-
     pathNodes = boustrophedon(grid, pathNodes, visited);
+    // return a list of points***
 #ifdef DEBUG_PLOT
     ROS_INFO("Visited grid updated after boustrophedon:");
     printGrid(grid, visited, pathNodes, PatternStart, pathNodes.back());
 #endif
-// what's this for loop for again?
+/////////////////????? what does it mean by path nodes again? what's this for loop for again?
     for (it = pathNodes.begin(); it != pathNodes.end(); ++it)
     {
       Point_t newPoint = { it->pos.x, it->pos.y };
@@ -271,10 +274,12 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
       fullPath.push_back(newPoint);
       //????????? what is fullpath pushback again?
     }
-
+    
+////////////////////////////////// where is it marking all boustrphedon is visited? 
+    
     goals = map_2_goals(visited, eNodeOpen);  // Retrieve remaining goalpoints
 //????? what are we doing here again? why are we erasing the elements???-> is it to start the new path?
-    // Remove all elements from pathNodes list except last element.
+    // ????????? why except last element? Remove all elements from pathNodes list except last element.
     // The last point is the starting point for a new search and A* extends the path from there on
     pathNodes.erase(pathNodes.begin(), --(pathNodes.end()));
     visited_counter--;  // First point is already counted as visited
@@ -283,7 +288,7 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
     //    to the nearest free space
     bool resign = a_star_to_open_space(grid, pathNodes.back(), 1, visited, goals, pathNodes);
     //??????????? what does it mean by open space is resigning?? what variables are we passing in?
-    
+    ///////////////////////
     if (resign)
     {
       ROS_WARN("A_star_to_open_space is resigning! This may be due to the open cells outside of the obstacle boundary. Goals Left: %u", goals.size());
@@ -296,7 +301,6 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
       if (visited[it->pos.y][it->pos.x])
       {
         multiple_pass_counter++;
-        //???????(how does this multiple pass counter varaible work and what does it do?
       }
       visited[it->pos.y][it->pos.x] = eNodeVisited;
     }
