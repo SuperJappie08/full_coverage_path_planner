@@ -20,11 +20,10 @@ namespace full_coverage_path_planner
 void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
 {
   // ???????????? what's the name parameter? 
- // gives cost map***> 
   
   if (!initialized_)
     //
-    //????????????? initialized meaning"? -> main access point to communicate with everything ros (ROS node = process)...-> node handle***-> ( change visibility )...-> 
+    // initialized meaning"? -> main access point to communicate with everything ros (ROS node = process)...-> node handle***-> ( change visibility )...-> 
   {
     // Create a publisher to visualize the plan
     ros::NodeHandle private_nh("~/");
@@ -33,7 +32,7 @@ void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* co
     plan_pub_ = private_named_nh.advertise<nav_msgs::Path>("plan", 1);
      
     // from nodehandle... publisher... (Access point to ROS function)..-> create a subscriber/publisher
-    //?????? what's cpp-grid for?? Try to request the cpp-grid from the cpp_grid map_server-> get static map.. published by map server (png file)---> occupancy grid (map)...-> publish map
+    // what's cpp-grid for?? Try to request the cpp-grid from the cpp_grid map_server-> get static map.. published by map server (png file)---> occupancy grid (map)...-> publish map
     //service(request directly from node) vs subscribe/publisher(calling function in other node)--> get map...-> gives the map***-> actually not using this... (not using static map but cost map)
     /////////////////////// why some public some private???
     /////////////////////// where does the Path or Getmap come from??
@@ -42,13 +41,13 @@ void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* co
     cpp_grid_client_ = nh.serviceClient<nav_msgs::GetMap>("static_map");
     // Get the cost map:
     costmap_ros_ = costmap_ros;
-    //???????? are we making a local copy(global variable) of the costmap here?
+    //are we making a local copy(global variable) of the costmap here?-> Yes
     costmap_ = costmap_ros->getCostmap();
 // all with _ end are global variable...
     
     // Define  robot radius (radius) parameter
     float robot_radius_default = 0.5f;
-    //???????? how does the f work?
+    //how does the f work? c++
     private_named_nh.param<float>("robot_radius", robot_radius_, robot_radius_default);
     // Define  tool radius (radius) parameter (does the coverage***) robot radius-> 
     float tool_radius_default = 0.5f; // ***** need to change to a smaller number... ( get it from param (param name to radius (navigation.launch under robot core to get it)..
@@ -160,8 +159,7 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
           }
           ROS_INFO("rotation dir with most space successful");
         }
-        // ????????????????when do we get into the following state?
-        // preferred turn direction ***-> variable pattern direction***=> top if right here***-> pattern direction not EAST r WEst***-> ( if no preferred turn direction---> travel to most open)
+        // Get into this following state-> (blocked or visited. valid move) preferred turn direction ***-> variable pattern direction***=> top if right here***-> pattern direction not East r West***-> ( if no preferred turn direction---> travel to most open)
         if (pattern_dir_ = east) {
             x2++;
         } else if (pattern_dir_ = west) {
@@ -172,7 +170,7 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
       // add Node to List
       addNodeToList(x2, y2, pathNodes, visited);
 
-      // change direction 180 deg
+      // change direction 180 deg (this is when after hit wall, increment by 1 node, then head backwards... this gets added to path list when the loop goes back up) 
       if (robot_dir == north) {
         robot_dir = south;
         dy = -1;
@@ -235,8 +233,8 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
                                           Point_t& init,
                                           int &multiple_pass_counter,
                                           int &visited_counter)
-{//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  //?????????????? what's multiple pass counter->  while update visited (outpput statistical....->  log )
+{
+  // what's multiple pass counter->  while update visited (output statistical....->  log )
   
   int x, y, nRows = grid.size(), nCols = grid[0].size();
   pattern_dir_ = point;
@@ -256,10 +254,10 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
   
   addNodeToList(x, y, pathNodes, visited);
 
-  std::list<Point_t> goals = map_2_goals(visited, eNodeOpen);  // Retrieve all goalpoints (Cells not visited)
-  ///////////????????????? where does this list of goalpoints come from? (how does it work?)
+  std::list<Point_t> goals = map_2_goals(visited, eNodeOpen);  // Retrieve all goalpoints (Cells not visited)--- all open cells
+  ///////////
   std::cout << "Goals Left: " << goals.size() << std::endl;
-  //????? how many goals to start with???(all cells not visited?)
+  // how many goals to start with???(all cells not visited?)
   std::list<gridNode_t>::iterator it;
 
 #ifdef DEBUG_PLOT
@@ -277,30 +275,30 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
     ROS_INFO("Visited grid updated after boustrophedon:");
     printGrid(grid, visited, pathNodes, PatternStart, pathNodes.back());
 #endif
-/////////////////????? what does it mean by path nodes again? what's this for loop for again?
+///////
     for (it = pathNodes.begin(); it != pathNodes.end(); ++it)
     {
       Point_t newPoint = { it->pos.x, it->pos.y };
-      //????? is this a pointer or another operation? (Above).... what do we need a visited couunter??
+      //?????is this a pointer or another operation? (Above).
       visited_counter++;
       fullPath.push_back(newPoint);
-      //????????? what is fullpath pushback again?
+      //what is fullpath pushback again?-> push all the points in to the path
     }
     
 ////////////////////////////////// where is it marking all boustrphedon is visited? 
     
     goals = map_2_goals(visited, eNodeOpen);  // Retrieve remaining goalpoints
-//????? what are we doing here again? why are we erasing the elements???-> is it to start the new path?
     // ????????? why except last element? Remove all elements from pathNodes list except last element.
     // The last point is the starting point for a new search and A* extends the path from there on
+    
+//????? what are we doing here again? why are we erasing the elements???-> is it to start the new path?
+
     pathNodes.erase(pathNodes.begin(), --(pathNodes.end()));
     visited_counter--;  // First point is already counted as visited
     // Plan to closest open Node using A*
-    // `goals` is essentially the map, so we use `goals` to determine the distance from the end of a potential path
+    // Pathnodes.back(is starting point)`goals` is essentially the map, so we use `goals` to determine the distance from the end of a potential path
     //    to the nearest free space
     bool resign = a_star_to_open_space(grid, pathNodes.back(), 1, visited, goals, pathNodes);
-    //??????????? what does it mean by open space is resigning?? what variables are we passing in?
-    ///////////////////////
     if (resign)
     {
       ROS_WARN("A_star_to_open_space is resigning! This may be due to the open cells outside of the obstacle boundary. Goals Left: %u", goals.size());
@@ -328,14 +326,13 @@ std::list<Point_t> BoustrophedonSTC::boustrophedon_stc(std::vector<std::vector<b
 #endif
 
   }
-  // ???????????? how frequent are we returning full path..
   return fullPath;
 }
 
 bool BoustrophedonSTC::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal,
                          std::vector<geometry_msgs::PoseStamped>& plan)
 {
-  // ??????????? Posestamped is the current location in cartesian from what particular frame? whats header what;s pose?
+  // Posestamped is the current location in cartesian from what particular frame? whats header what;s pose?
   if (!initialized_)
   {
     ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
@@ -349,7 +346,7 @@ bool BoustrophedonSTC::makePlan(const geometry_msgs::PoseStamped& start, const g
   //clear the plan, just in case
   plan.clear();
   costmap_ = costmap_ros_->getCostmap();
-  //?????????????? is the costmap_ros_ a global variable ?
+  //is the costmap_ros_ a global variable ?
 // this is updated cost map??
   clock_t begin = clock();
   Point_t startPoint;
