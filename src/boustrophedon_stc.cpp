@@ -59,12 +59,12 @@ void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* co
    //boustrophedon (only the mountain pattern up and down)... stc(spanning key tree coverage----> reach deadend... still have area to cover (a-star)...-> 
 
 
-std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bool> > const& grid, std::list<gridNode_t>& init,
-                                        std::vector<std::vector<bool> >& visited)
+  // std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bool> > const& grid, std::list<gridNode_t>& init,
+  //                                       std::vector<std::vector<bool> >& visited)
   
   ///
   std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bool> > const& grid, std::list<gridNode_t>& init,
-                                        std::vector<std::vector<bool> >& visited, /*/GLOBAL VAR (VERT/HORIZONTAL)/*/)
+                                        std::vector<std::vector<bool> >& visited /*/GLOBAL VAR (VERT/HORIZONTAL)/*/)
 {
   int dx, dy, x2, y2, i, nRows = grid.size(), nCols = grid[0].size();
   // Mountain pattern filling of the open space
@@ -79,11 +79,6 @@ std::list<gridNode_t> BoustrophedonSTC::boustrophedon(std::vector<std::vector<bo
   int robot_dir = dirWithMostSpace(x2, y2, nCols, nRows, grid, visited, point);
 /*  GLOBAL VAR++*/  
 /*/   if global var ==1 /*/
-  int robot_dir = 
-    
-    
-
-  
   // set dx and dy based on robot_dir
   switch(robot_dir) {
     case east: // 1

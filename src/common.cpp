@@ -224,7 +224,7 @@ void printGrid(std::vector<std::vector<bool> > const& grid, std::vector<std::vec
         {
           std::cout << "\033[1;32m▓\033[0m";  // Show starting position in green color
         }
-        else if (ix == path.back().x && iy == path.back().y) path.back = red
+        else if (ix == path.back().x && iy == path.back().y)
         {
           std::cout << "\033[1;31m▓\033[0m";  // Show stopping position in red color
         }
@@ -392,7 +392,7 @@ int dirWithMostSpace(int x_init, int y_init, int nCols, int nRows,
 
   //????????? use the biggest value***-> 
   // set initial direction towards direction with most travel possible
-
+  int robot_dir = 0;
   int indexValue = 0;
   for (int i = 1; i <= 4; i++) {
       // std::cout << "free space in " << i << ": " << free_space_in_dir[i] << std::endl;
