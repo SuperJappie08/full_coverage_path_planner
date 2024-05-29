@@ -75,7 +75,7 @@ public:
   virtual bool makePlan(const geometry_msgs::PoseStamped& start,
                         const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan) = 0;
 
-protected:
+public:
   /**
    * Convert internal representation of a to a ROS path
    * @param start Start pose of robot

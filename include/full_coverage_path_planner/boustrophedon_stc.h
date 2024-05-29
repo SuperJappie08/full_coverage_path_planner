@@ -28,7 +28,7 @@ using std::string;
 #include "full_coverage_path_planner/full_coverage_path_planner.h"
 namespace full_coverage_path_planner
 {
-class BoustrophedonSTC : public nav_core::BaseGlobalPlanner, private full_coverage_path_planner::FullCoveragePathPlanner
+class BoustrophedonSTC : public nav_core::BaseGlobalPlanner, public full_coverage_path_planner::FullCoveragePathPlanner
 {
 public:
   /**
