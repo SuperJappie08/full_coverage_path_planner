@@ -128,7 +128,7 @@ void FullCoveragePathPlanner::parsePointlist2Plan(const geometry_msgs::PoseStamp
       // Add to vector if required
       if (do_publish)
       {
-        new_goal.header.frame_id = "map";
+        new_goal.header.frame_id = map_frame_;
         //?????????????? why tile size * 0.5???
         new_goal.pose.position.x = (it->x) * tile_size_ + grid_origin_.x + tile_size_ * 0.5;
         new_goal.pose.position.y = (it->y) * tile_size_ + grid_origin_.y + tile_size_ * 0.5;
@@ -175,7 +175,7 @@ void FullCoveragePathPlanner::parsePointlist2Plan(const geometry_msgs::PoseStamp
   else
   {
     //??????????? when does this else statement get triggered? 
-    new_goal.header.frame_id = "map";
+    new_goal.header.frame_id = map_frame_;
     new_goal.pose.position.x = (goalpoints.begin()->x) * tile_size_ + grid_origin_.x + tile_size_ * 0.5;
     new_goal.pose.position.y = (goalpoints.begin()->y) * tile_size_ + grid_origin_.y + tile_size_ * 0.5;
     new_goal.pose.orientation = tf::createQuaternionMsgFromYaw(0);

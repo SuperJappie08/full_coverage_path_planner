@@ -129,6 +129,7 @@ public:
   fPoint_t grid_origin_;
   bool initialized_;
   geometry_msgs::PoseStamped previous_goal_;
+  string map_frame_;
 
   struct boustrophedon_cpp_metrics_type
   {

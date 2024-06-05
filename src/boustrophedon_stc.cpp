@@ -44,6 +44,8 @@ void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* co
     //are we making a local copy(global variable) of the costmap here?-> Yes
     costmap_ = costmap_ros->getCostmap();
 // all with _ end are global variable...
+
+    private_named_nh.param<std::string>("map_frame", map_frame_, "map");
     
     // Define  robot radius (radius) parameter
     float robot_radius_default = 0.5f;
