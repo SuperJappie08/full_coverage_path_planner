@@ -32,7 +32,7 @@
 // Default Constructor
 namespace full_coverage_path_planner
 {
-FullCoveragePathPlanner::FullCoveragePathPlanner() : initialized_(false)
+FullCoveragePathPlanner::FullCoveragePathPlanner() : initialized_(false), publish_all_points_(false)
 {
 }
 
@@ -119,7 +119,7 @@ void FullCoveragePathPlanner::parsePointlist2Plan(const geometry_msgs::PoseStamp
       move_dir_next = dx_next + dy_next * 2;
 
       // Check if this points needs to be published (i.e. a change of direction or first or last point in list)
-      do_publish = move_dir_next != move_dir_now || it == goalpoints.begin() ||
+      do_publish = (move_dir_next != move_dir_now || publish_all_points_) || it == goalpoints.begin() ||
                    (it != goalpoints.end() && it == --goalpoints.end());
       move_dir_prev = move_dir_now;
 

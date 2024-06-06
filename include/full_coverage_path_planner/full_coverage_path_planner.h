@@ -130,6 +130,7 @@ public:
   bool initialized_;
   geometry_msgs::PoseStamped previous_goal_;
   string map_frame_;
+  bool publish_all_points_;
 
   struct boustrophedon_cpp_metrics_type
   {

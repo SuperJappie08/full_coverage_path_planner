@@ -55,6 +55,8 @@ void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* co
     float tool_radius_default = 0.5f; // ***** need to change to a smaller number... ( get it from param (param name to radius (navigation.launch under robot core to get it)..
 //
     private_named_nh.param<float>("tool_radius", tool_radius_, tool_radius_default);
+
+    private_named_nh.param<bool>("publish_all_points", publish_all_points_, publish_all_points_);
     initialized_ = true;
   }
 }
