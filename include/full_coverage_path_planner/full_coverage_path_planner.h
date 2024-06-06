@@ -129,8 +129,11 @@ public:
   fPoint_t grid_origin_;
   bool initialized_;
   geometry_msgs::PoseStamped previous_goal_;
+  // geometry_msgs::PoseStamped previous_extra_goal_;
   string map_frame_;
   bool publish_all_points_;
+  bool publish_double_orientation_;
+  // bool publish_extra_points_;
 
   struct boustrophedon_cpp_metrics_type
   {

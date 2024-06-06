@@ -57,6 +57,8 @@ void BoustrophedonSTC::initialize(std::string name, costmap_2d::Costmap2DROS* co
     private_named_nh.param<float>("tool_radius", tool_radius_, tool_radius_default);
 
     private_named_nh.param<bool>("publish_all_points", publish_all_points_, publish_all_points_);
+    private_named_nh.param<bool>("publish_double_orientation", publish_double_orientation_, publish_double_orientation_);
+    
     initialized_ = true;
   }
 }
